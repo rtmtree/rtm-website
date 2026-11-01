@@ -10,4 +10,4 @@ python3 -m http.server 8000
 
 ## Deploy
 
-Push to a GitHub repository and enable GitHub Pages from the `main` branch. The `CNAME` file sets the custom domain, `rtm-soft.com`. Point its DNS at GitHub Pages, and set up the `contact@rtm-soft.com` mailbox.
+Push to a GitHub repository and enable GitHub Pages from the `main` branch. The `CNAME` file sets the custom domain, `rtm-soft.com`. Point its DNS at GitHub Pages.
