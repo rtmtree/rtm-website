@@ -1,6 +1,6 @@
 # RTM SOFT website
 
-Static company website for RTM SOFT Co., Ltd., used as the public organization website for the Apple Developer Program migration. It has no build step.
+Static company website for RTM SOFT COMPANY LIMITED, used as the public organization website for the Apple Developer Program migration. It has no build step.
 
 ## Preview
 
