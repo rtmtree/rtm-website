@@ -329,3 +329,14 @@ address { font-style: normal; }
   .compat-table .c-notes:not(:empty) { margin-top: 6px; }
 }
 .meta-link { color: inherit; }
+
+/* Five-link menu: put it on its own row on narrow phones */
+@media (max-width: 600px) {
+  .site-header { flex-wrap: wrap; row-gap: 12px; padding-block: 18px; }
+  .site-header nav {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .site-header nav a { flex: none; }
+}
