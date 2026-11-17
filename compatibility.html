@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RTMHub Compatibility — RTM SOFT</title>
+  <meta name="description" content="Which PC games and visual novels run in RTMHub on iPhone and iPad, as tested by RTM SOFT.">
+  <link rel="icon" href="assets/icons/gameplaytoo.jpg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header wrap">
+    <a class="wordmark" href="./">RTM SOFT</a>
+    <nav aria-label="Main">
+      <a href="./#apps">Apps</a>
+      <a href="about.html">About</a>
+      <a href="support.html">Support</a>
+      <a href="support.html#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main class="wrap compat">
+    <h1>RTMHub compatibility</h1>
+    <p class="compat-intro">PC (Windows) games we've tested in <a href="rtmhub.html">RTMHub</a>, and how far each one gets. Results come from our own testing and change as RTMHub improves. <span id="compat-meta"></span></p>
+
+    <dl class="status-key">
+      <div><dt><span class="badge s-playable">Playable</span></dt><dd>Plays through with at most minor issues.</dd></div>
+      <div><dt><span class="badge s-runnable">Runnable</span></dt><dd>Reaches gameplay or story, but slowly or after a long load.</dd></div>
+      <div><dt><span class="badge s-in-menu">In menu</span></dt><dd>Menus work; gameplay doesn't start yet.</dd></div>
+      <div><dt><span class="badge s-intro">Intro</span></dt><dd>Shows its intro or title screen, then stops.</dd></div>
+      <div><dt><span class="badge s-boots">Boots</span></dt><dd>Starts, but stalls or quits before the menu.</dd></div>
+      <div><dt><span class="badge s-unplayable">Unplayable</span></dt><dd>Doesn't start.</dd></div>
+      <div><dt><span class="badge s-unchecked">Unchecked</span></dt><dd>Not tested yet.</dd></div>
+    </dl>
+
+    <div class="compat-tools">
+      <label class="visually-hidden" for="compat-search">Search games</label>
+      <input id="compat-search" type="search" placeholder="Search games" autocomplete="off">
+      <div id="compat-filters" class="chips" role="group" aria-label="Filter by status"></div>
+    </div>
+
+    <p id="compat-status" class="compat-count" aria-live="polite">Loading the compatibility list…</p>
+
+    <table class="compat-table" hidden>
+      <thead>
+        <tr><th scope="col">Game</th><th scope="col">Status</th><th scope="col">Notes</th></tr>
+      </thead>
+      <tbody id="compat-rows"></tbody>
+    </table>
+
+    <noscript><p>Turn on JavaScript to see the list here, or view it <a href="https://github.com/RTM-WIN/compatibility-list/blob/main/pc.json">on GitHub</a>.</p></noscript>
+
+    <p class="compat-foot">Missing a game, or seeing a different result? Email <a href="mailto:contact@rtm-soft.com">contact@rtm-soft.com</a> with the game, your device and what happened. The raw list is <a href="https://github.com/RTM-WIN/compatibility-list/blob/main/pc.json">on GitHub</a>.</p>
+  </main>
+
+  <footer class="site-footer wrap">
+    <p>© 2026 RTM SOFT COMPANY LIMITED. <a href="about.html">About</a> · <a href="support.html">Support</a> · <a href="privacy.html">Privacy and terms</a></p>
+    <p class="fine">Game titles are trademarks of their respective owners. RTM SOFT is not affiliated with or endorsed by them, and RTMHub doesn't include or sell games. Apple, iPhone, iPad and App Store are trademarks of Apple Inc.</p>
+  </footer>
+
+  <script>
+  (function () {
+    var SOURCE = 'https://raw.githubusercontent.com/RTM-WIN/compatibility-list/main/pc.json';
+    var STATUSES = [
+      ['playable', 'Playable'], ['runnable', 'Runnable'], ['in-menu', 'In menu'],
+      ['intro', 'Intro'], ['boots', 'Boots'], ['unplayable', 'Unplayable'], ['unchecked', 'Unchecked']
+    ];
+    var LABEL = {}, RANK = {};
+    STATUSES.forEach(function (s, i) { LABEL[s[0]] = s[1]; RANK[s[0]] = i; });
+
+    var table = document.querySelector('.compat-table');
+    var rows = document.getElementById('compat-rows');
+    var status = document.getElementById('compat-status');
+    var search = document.getElementById('compat-search');
+    var filters = document.getElementById('compat-filters');
+    var entries = [], active = 'all';
+
+    function el(tag, cls, text) {
+      var n = document.createElement(tag);
+      if (cls) n.className = cls;
+      if (text != null) n.textContent = text;
+      return n;
+    }
+
+    function badge(s) {
+      var key = LABEL[s] ? s : 'unchecked';
+      return el('span', 'badge s-' + key, LABEL[key]);
+    }
+
+    function render() {
+      var q = search.value.trim().toLowerCase();
+      var shown = entries.filter(function (e) {
+        return (active === 'all' || e.status === active) &&
+          (!q || String(e.title).toLowerCase().indexOf(q) !== -1);
+      });
+      rows.replaceChildren();
+      shown.forEach(function (e) {
+        var tr = el('tr');
+        var game = el('td', 'c-game');
+        var name = /^\d+$/.test(String(e.steamAppID))
+          ? Object.assign(el('a', null, e.title), { href: 'https://store.steampowered.com/app/' + e.steamAppID + '/' })
+          : el('span', null, e.title);
+        game.append(name);
+        var bits = [];
+        if (e.year) bits.push(e.year);
+        if (e.isVN) bits.push('Visual novel');
+        if (e.arch) bits.push(e.arch === 'x64' ? '64-bit' : '32-bit');
+        if (bits.length) game.append(el('span', 'c-sub', bits.join(' · ')));
+        var st = el('td', 'c-status');
+        st.append(badge(e.status));
+        var notes = el('td', 'c-notes', e.notes || '');
+        if (e.testOnDevice) notes.append(el('span', 'c-sub', 'Tested on ' + e.testOnDevice));
+        tr.append(game, st, notes);
+        rows.append(tr);
+      });
+      status.textContent = shown.length === entries.length
+        ? entries.length + ' games'
+        : shown.length + ' of ' + entries.length + ' games';
+    }
+
+    function buildFilters() {
+      var counts = {};
+      entries.forEach(function (e) { counts[e.status] = (counts[e.status] || 0) + 1; });
+      var opts = [['all', 'All', entries.length]].concat(
+        STATUSES.filter(function (s) { return counts[s[0]]; })
+          .map(function (s) { return [s[0], s[1], counts[s[0]]]; }));
+      opts.forEach(function (o) {
+        var b = el('button', 'chip', o[1] + ' ' + o[2]);
+        b.type = 'button';
+        b.setAttribute('aria-pressed', String(o[0] === active));
+        b.addEventListener('click', function () {
+          active = o[0];
+          filters.querySelectorAll('.chip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === b)); });
+          render();
+        });
+        filters.append(b);
+      });
+    }
+
+    fetch(SOURCE, { cache: 'no-cache' })
+      .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+      .then(function (data) {
+        entries = (data.entries || []).slice().sort(function (a, b) {
+          var ra = RANK[a.status] == null ? 99 : RANK[a.status];
+          var rb = RANK[b.status] == null ? 99 : RANK[b.status];
+          return ra - rb || String(a.title).localeCompare(String(b.title));
+        });
+        if (data.updated) {
+          var d = new Date(data.updated + 'T00:00:00');
+          document.getElementById('compat-meta').textContent = 'Last updated ' +
+            (isNaN(d) ? data.updated : d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })) + '.';
+        }
+        buildFilters();
+        table.hidden = false;
+        search.addEventListener('input', render);
+        render();
+      })
+      .catch(function () {
+        status.replaceChildren('The list couldn’t load. You can view it ',
+          Object.assign(el('a', null, 'on GitHub'), { href: 'https://github.com/RTM-WIN/compatibility-list/blob/main/pc.json' }), '.');
+      });
+  })();
+  </script>
+</body>
+</html>
